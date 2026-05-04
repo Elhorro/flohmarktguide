@@ -14,6 +14,7 @@ export interface Flohmarkt {
   lat: number;
   lng: number;
   freigegeben: boolean;
+  featured: boolean;
   erstellt_am: string;
 }
 
@@ -49,6 +50,7 @@ export type Database = {
           lat: number;
           lng: number;
           freigegeben: boolean;
+          featured: boolean;
           erstellt_am: string;
         };
         Insert: {
@@ -65,6 +67,7 @@ export type Database = {
           lat?: number;
           lng?: number;
           freigegeben?: boolean;
+          featured?: boolean;
           erstellt_am?: string;
         };
         Update: Partial<Database['public']['Tables']['flohmärkte']['Insert']>;

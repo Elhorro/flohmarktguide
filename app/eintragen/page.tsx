@@ -1,12 +1,28 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { CircleCheck as CheckCircle, Loader as Loader2, CircleAlert as AlertCircle } from 'lucide-react';
+import {
+  CircleCheck as CheckCircle,
+  Loader as Loader2,
+  CircleAlert as AlertCircle,
+  MapPin,
+} from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import { FlohmarktTyp } from '@/lib/types';
+
+// Dynamically imported to avoid SSR issues with Leaflet
+const LocationPicker = dynamic(() => import('@/components/LocationPicker'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[260px] rounded-xl bg-stone-100 animate-pulse flex items-center justify-center">
+      <span className="text-stone-400 text-sm">Karte wird geladen…</span>
+    </div>
+  ),
+});
 
 const schema = z.object({
   titel: z.string().min(3, 'Titel muss mindestens 3 Zeichen haben'),
@@ -21,6 +37,7 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
+interface LatLng { lat: number; lng: number }
 
 const typenOptionen: FlohmarktTyp[] = ['Flohmarkt', 'Fetzenmarkt', 'Hausflohmarkt', 'Antikmarkt'];
 
@@ -51,11 +68,14 @@ const errorInputClass =
 export default function EintragenPage() {
   const [success, setSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [manualCoords, setManualCoords] = useState<LatLng | null>(null);
+  const [showMap, setShowMap] = useState(false);
 
   const {
     register,
     control,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
     reset,
   } = useForm<FormData>({
@@ -67,20 +87,31 @@ export default function EintragenPage() {
     },
   });
 
+  const watchedAdresse = watch('adresse');
+  const watchedStadt = watch('stadt');
+
   const onSubmit = async (data: FormData) => {
     setSubmitError(null);
     try {
+      const body: Record<string, unknown> = {
+        ...data,
+        datum: data.datum.toISOString().split('T')[0],
+      };
+      if (manualCoords) {
+        body.lat = manualCoords.lat;
+        body.lng = manualCoords.lng;
+      }
+
       const res = await fetch('/api/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...data,
-          datum: data.datum.toISOString().split('T')[0],
-        }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error(await res.text());
       setSuccess(true);
       reset();
+      setManualCoords(null);
+      setShowMap(false);
     } catch {
       setSubmitError('Ein Fehler ist aufgetreten. Bitte versuche es nochmal.');
     }
@@ -92,9 +123,7 @@ export default function EintragenPage() {
       <div className="bg-orange-50/40 min-h-screen py-10 px-4 sm:px-6">
         <div className="max-w-2xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-stone-800 mb-2">
-              Flohmarkt eintragen
-            </h1>
+            <h1 className="text-3xl font-bold text-stone-800 mb-2">Flohmarkt eintragen</h1>
             <p className="text-stone-500">
               Trag deinen Markt kostenlos ein. Nach kurzer Prüfung wird er freigeschaltet.
             </p>
@@ -105,12 +134,10 @@ export default function EintragenPage() {
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle size={40} className="text-green-500" />
               </div>
-              <h2 className="text-2xl font-bold text-stone-800 mb-3">
-                Danke!
-              </h2>
+              <h2 className="text-2xl font-bold text-stone-800 mb-3">Danke!</h2>
               <p className="text-stone-500 mb-8 text-base leading-relaxed">
-                Dein Flohmarkt wurde eingereicht und wird nach Prüfung freigeschaltet.
-                Das dauert in der Regel nicht lange!
+                Dein Flohmarkt wurde eingereicht und wird nach Prüfung freigeschaltet. Das dauert
+                in der Regel nicht lange!
               </p>
               <button
                 onClick={() => setSuccess(false)}
@@ -122,6 +149,7 @@ export default function EintragenPage() {
           ) : (
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
               <div className="bg-white rounded-3xl border border-stone-100 p-6 sm:p-8 shadow-sm space-y-5">
+                {/* Titel */}
                 <div>
                   <FieldLabel required>Titel des Marktes</FieldLabel>
                   <input
@@ -132,6 +160,7 @@ export default function EintragenPage() {
                   <FieldError message={errors.titel?.message} />
                 </div>
 
+                {/* Typ */}
                 <div>
                   <FieldLabel required>Art des Marktes</FieldLabel>
                   <select
@@ -147,6 +176,7 @@ export default function EintragenPage() {
                   <FieldError message={errors.typ?.message} />
                 </div>
 
+                {/* Datum */}
                 <div>
                   <FieldLabel required>Datum</FieldLabel>
                   <Controller
@@ -171,6 +201,7 @@ export default function EintragenPage() {
                   <FieldError message={errors.datum?.message} />
                 </div>
 
+                {/* Zeiten */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <FieldLabel required>Beginn</FieldLabel>
@@ -192,6 +223,7 @@ export default function EintragenPage() {
                   </div>
                 </div>
 
+                {/* Adresse */}
                 <div>
                   <FieldLabel required>Straße &amp; Hausnummer</FieldLabel>
                   <input
@@ -202,6 +234,7 @@ export default function EintragenPage() {
                   <FieldError message={errors.adresse?.message} />
                 </div>
 
+                {/* Stadt */}
                 <div>
                   <FieldLabel required>Stadt / Gemeinde</FieldLabel>
                   <input
@@ -212,6 +245,39 @@ export default function EintragenPage() {
                   <FieldError message={errors.stadt?.message} />
                 </div>
 
+                {/* Location Picker (optional) */}
+                <div className="border border-stone-100 rounded-2xl p-4 bg-stone-50/50">
+                  <button
+                    type="button"
+                    onClick={() => setShowMap((v) => !v)}
+                    className="flex items-center gap-2 text-sm font-medium text-stone-600 hover:text-orange-500 transition-colors w-full"
+                  >
+                    <MapPin size={16} className={manualCoords ? 'text-orange-500' : 'text-stone-400'} />
+                    <span>
+                      {manualCoords
+                        ? '✓ Standort manuell gesetzt – Karte anzeigen / ändern'
+                        : 'Standort auf Karte verfeinern (optional)'}
+                    </span>
+                    <span className="ml-auto text-stone-300">{showMap ? '▲' : '▼'}</span>
+                  </button>
+
+                  {showMap && (
+                    <div className="mt-4">
+                      <p className="text-xs text-stone-400 mb-3">
+                        Adresse oben eingeben und auf{' '}
+                        <em>Adresse auf Karte finden</em> klicken, oder direkt auf die Karte
+                        klicken um den Standort zu setzen.
+                      </p>
+                      <LocationPicker
+                        adresse={watchedAdresse}
+                        stadt={watchedStadt}
+                        onChange={setManualCoords}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Beschreibung */}
                 <div>
                   <FieldLabel required>Beschreibung</FieldLabel>
                   <textarea
@@ -223,6 +289,7 @@ export default function EintragenPage() {
                   <FieldError message={errors.beschreibung?.message} />
                 </div>
 
+                {/* Kontakt */}
                 <div>
                   <FieldLabel>Kontakt (optional)</FieldLabel>
                   <input
@@ -255,8 +322,8 @@ export default function EintragenPage() {
                     )}
                   </button>
                   <p className="text-center text-xs text-stone-400 mt-3">
-                    Felder mit <span className="text-orange-500">*</span> sind Pflichtfelder.
-                    Alle Angaben werden vor Veröffentlichung geprüft.
+                    Felder mit <span className="text-orange-500">*</span> sind Pflichtfelder. Alle
+                    Angaben werden vor Veröffentlichung geprüft.
                   </p>
                 </div>
               </div>

@@ -80,3 +80,17 @@ export async function getAlleFlohmärkte(): Promise<Flohmarkt[]> {
   if (error) throw error;
   return data ?? [];
 }
+
+export async function getFeaturedMärkte(limit = 6): Promise<Flohmarkt[]> {
+  const today = new Date().toISOString().split('T')[0];
+  const { data, error } = await getSupabase()
+    .from('flohmärkte')
+    .select('*')
+    .eq('freigegeben', true)
+    .eq('featured', true)
+    .gte('datum', today)
+    .order('datum', { ascending: true })
+    .limit(limit);
+  if (error) throw error;
+  return data ?? [];
+}

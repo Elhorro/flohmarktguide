@@ -16,6 +16,9 @@ const schema = z.object({
   stadt: z.string().min(2).max(100),
   beschreibung: z.string().min(10).max(1000),
   kontakt: z.string().max(200).optional(),
+  // Optional manual coordinates from LocationPicker
+  lat: z.number().min(-90).max(90).optional(),
+  lng: z.number().min(-180).max(180).optional(),
 });
 
 async function geocode(adresse: string, stadt: string): Promise<{ lat: number; lng: number }> {
@@ -57,8 +60,13 @@ export async function POST(request: NextRequest) {
 
   const d = parsed.data;
 
-  // Koordinaten automatisch ermitteln
-  const { lat, lng } = await geocode(d.adresse, d.stadt);
+  // Use manually provided coordinates if present, otherwise geocode
+  let coords: { lat: number; lng: number };
+  if (d.lat !== undefined && d.lng !== undefined) {
+    coords = { lat: d.lat, lng: d.lng };
+  } else {
+    coords = await geocode(d.adresse, d.stadt);
+  }
 
   const supabase = createServerClient();
 
@@ -73,8 +81,8 @@ export async function POST(request: NextRequest) {
       stadt: d.stadt,
       beschreibung: d.beschreibung,
       kontakt: d.kontakt ?? null,
-      lat,
-      lng,
+      lat: coords.lat,
+      lng: coords.lng,
       freigegeben: false,
     },
   ]);
