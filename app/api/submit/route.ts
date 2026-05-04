@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createServerClient } from '@/lib/supabase-server';
 
+// Graz-Mitte als Fallback wenn Geocoding fehlschlägt
+const FALLBACK_LAT = 47.0707;
+const FALLBACK_LNG = 15.4395;
+
 const schema = z.object({
   titel: z.string().min(3).max(200),
   typ: z.enum(['Flohmarkt', 'Fetzenmarkt', 'Hausflohmarkt', 'Antikmarkt']),
@@ -13,6 +17,27 @@ const schema = z.object({
   beschreibung: z.string().min(10).max(1000),
   kontakt: z.string().max(200).optional(),
 });
+
+async function geocode(adresse: string, stadt: string): Promise<{ lat: number; lng: number }> {
+  const query = encodeURIComponent(`${adresse}, ${stadt}, Austria`);
+  const url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1&countrycodes=at`;
+
+  try {
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'FlohmarktKalender/1.0 (leopold.kumpusch@gmail.com)' },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) throw new Error(`Nominatim ${res.status}`);
+
+    const results: Array<{ lat: string; lon: string }> = await res.json();
+    if (results.length === 0) throw new Error('Keine Koordinaten gefunden');
+
+    return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
+  } catch (err) {
+    console.warn('[geocode] Fallback auf Graz-Mitte:', (err as Error).message);
+    return { lat: FALLBACK_LAT, lng: FALLBACK_LNG };
+  }
+}
 
 export async function POST(request: NextRequest) {
   let body: unknown;
@@ -31,6 +56,10 @@ export async function POST(request: NextRequest) {
   }
 
   const d = parsed.data;
+
+  // Koordinaten automatisch ermitteln
+  const { lat, lng } = await geocode(d.adresse, d.stadt);
+
   const supabase = createServerClient();
 
   const { error } = await supabase.from('flohmärkte').insert([
@@ -44,8 +73,8 @@ export async function POST(request: NextRequest) {
       stadt: d.stadt,
       beschreibung: d.beschreibung,
       kontakt: d.kontakt ?? null,
-      lat: 47.0707,
-      lng: 15.4395,
+      lat,
+      lng,
       freigegeben: false,
     },
   ]);
