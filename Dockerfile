@@ -2,12 +2,12 @@
 FROM node:20-alpine AS dependencies
 WORKDIR /app
 COPY package.json package-lock.json* yarn.lock* pnpm-lock.yaml* ./
-RUN npm ci --only=production || npm install --only=production
+RUN npm ci --only=production --legacy-peer-deps || npm install --only=production --legacy-peer-deps
 
 FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json* yarn.lock* pnpm-lock.yaml* ./
-RUN npm ci || npm install
+RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 COPY . .
 # Build mit erforderlichen Umgebungsvariablen
 ARG NEXT_PUBLIC_SUPABASE_URL
