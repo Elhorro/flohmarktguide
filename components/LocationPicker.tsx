@@ -27,6 +27,7 @@ interface LatLng {
 export interface LocationPickerProps {
   onChange: (loc: LatLng) => void;
   adresse?: string;
+  plz?: string;
   stadt?: string;
 }
 
@@ -64,7 +65,7 @@ function MapClickHandler({ onMapClick }: { onMapClick: (ll: LatLng) => void }) {
   return null;
 }
 
-export default function LocationPicker({ onChange, adresse, stadt }: LocationPickerProps) {
+export default function LocationPicker({ onChange, adresse, plz, stadt }: LocationPickerProps) {
   const [position, setPosition] = useState<LatLng | null>(null);
   const [geocoding, setGeocoding] = useState(false);
   const [geocodeStatus, setGeocodeStatus] = useState<'idle' | 'found' | 'notfound'>('idle');
@@ -79,7 +80,7 @@ export default function LocationPicker({ onChange, adresse, stadt }: LocationPic
   );
 
   const geocodeAddress = useCallback(async () => {
-    const q = [adresse, stadt, 'Austria'].filter(Boolean).join(' ');
+    const q = [adresse, plz, stadt, 'Austria'].filter(Boolean).join(' ');
     if (!q.trim()) return;
 
     setGeocoding(true);
@@ -104,9 +105,9 @@ export default function LocationPicker({ onChange, adresse, stadt }: LocationPic
     } finally {
       setGeocoding(false);
     }
-  }, [adresse, stadt, onChange]);
+  }, [adresse, plz, stadt, onChange]);
 
-  const canGeocode = Boolean(adresse || stadt);
+  const canGeocode = Boolean(adresse || plz || stadt);
 
   return (
     <div className="space-y-3">

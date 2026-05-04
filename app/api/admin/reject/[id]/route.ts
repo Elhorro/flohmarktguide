@@ -18,7 +18,7 @@ export async function DELETE(
 
   const supabase = createServerClient();
   const { error } = await supabase
-    .from('flohmärkte')
+    .from('fm_flea_markets')
     .delete()
     .eq('id', params.id);
 

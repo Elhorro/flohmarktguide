@@ -16,7 +16,7 @@ export default async function AdminPage({
 
   const supabase = createServerClient();
   const { data: märkte, error } = await supabase
-    .from('flohmärkte')
+    .from('fm_flea_markets')
     .select('*')
     .order('erstellt_am', { ascending: false });
 

@@ -8,6 +8,7 @@ export interface Flohmarkt {
   uhrzeit_start: string;
   uhrzeit_ende: string;
   adresse: string;
+  plz?: string | null;
   stadt: string;
   beschreibung: string;
   kontakt?: string | null;
@@ -35,7 +36,7 @@ export type FilterOption = 'alle' | 'heute' | 'wochenende' | 'naechste_woche';
 export type Database = {
   public: {
     Tables: {
-      flohmärkte: {
+      fm_flea_markets: {
         Row: {
           id: string;
           titel: string;
@@ -44,6 +45,7 @@ export type Database = {
           uhrzeit_start: string;
           uhrzeit_ende: string;
           adresse: string;
+          plz: string | null;
           stadt: string;
           beschreibung: string;
           kontakt: string | null;
@@ -61,6 +63,7 @@ export type Database = {
           uhrzeit_start?: string;
           uhrzeit_ende?: string;
           adresse?: string;
+          plz?: string | null;
           stadt?: string;
           beschreibung?: string;
           kontakt?: string | null;
@@ -70,7 +73,7 @@ export type Database = {
           featured?: boolean;
           erstellt_am?: string;
         };
-        Update: Partial<Database['public']['Tables']['flohmärkte']['Insert']>;
+        Update: Partial<Database['public']['Tables']['fm_flea_markets']['Insert']>;
         Relationships: [];
       };
     };

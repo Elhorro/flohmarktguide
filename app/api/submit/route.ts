@@ -13,6 +13,7 @@ const schema = z.object({
   uhrzeit_start: z.string().regex(/^\d{2}:\d{2}$/),
   uhrzeit_ende: z.string().regex(/^\d{2}:\d{2}$/),
   adresse: z.string().min(3).max(200),
+  plz: z.string().max(10).optional(),
   stadt: z.string().min(2).max(100),
   beschreibung: z.string().min(10).max(1000),
   kontakt: z.string().max(200).optional(),
@@ -21,8 +22,9 @@ const schema = z.object({
   lng: z.number().min(-180).max(180).optional(),
 });
 
-async function geocode(adresse: string, stadt: string): Promise<{ lat: number; lng: number }> {
-  const query = encodeURIComponent(`${adresse}, ${stadt}, Austria`);
+async function geocode(adresse: string, plz: string | undefined, stadt: string): Promise<{ lat: number; lng: number }> {
+  const parts = [adresse, plz, stadt, 'Austria'].filter(Boolean).join(', ');
+  const query = encodeURIComponent(parts);
   const url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1&countrycodes=at`;
 
   try {
@@ -65,12 +67,12 @@ export async function POST(request: NextRequest) {
   if (d.lat !== undefined && d.lng !== undefined) {
     coords = { lat: d.lat, lng: d.lng };
   } else {
-    coords = await geocode(d.adresse, d.stadt);
+    coords = await geocode(d.adresse, d.plz, d.stadt);
   }
 
   const supabase = createServerClient();
 
-  const { error } = await supabase.from('flohmärkte').insert([
+  const { error } = await supabase.from('fm_flea_markets').insert([
     {
       titel: d.titel,
       typ: d.typ,
@@ -78,6 +80,7 @@ export async function POST(request: NextRequest) {
       uhrzeit_start: d.uhrzeit_start,
       uhrzeit_ende: d.uhrzeit_ende,
       adresse: d.adresse,
+      plz: d.plz ?? null,
       stadt: d.stadt,
       beschreibung: d.beschreibung,
       kontakt: d.kontakt ?? null,

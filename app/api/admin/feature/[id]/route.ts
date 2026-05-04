@@ -17,7 +17,7 @@ export async function PATCH(
   const supabase = createServerClient();
 
   const { error } = await supabase
-    .from('flohmärkte')
+    .from('fm_flea_markets')
     .update({ featured })
     .eq('id', params.id);
 

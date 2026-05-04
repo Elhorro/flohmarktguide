@@ -34,7 +34,7 @@ function getDateRange(filter: FilterOption): { from: string; to: string } | null
 function buildFilteredQuery(filter: FilterOption) {
   const today = new Date().toISOString().split('T')[0];
   let query = getSupabase()
-    .from('flohmärkte')
+    .from('fm_flea_markets')
     .select('*')
     .eq('freigegeben', true)
     .order('datum', { ascending: true });
@@ -62,7 +62,7 @@ export async function getNext10Flohmärkte(filter: FilterOption = 'alle'): Promi
 
 export async function getFlohmarktById(id: string): Promise<Flohmarkt | null> {
   const { data, error } = await getSupabase()
-    .from('flohmärkte')
+    .from('fm_flea_markets')
     .select('*')
     .eq('id', id)
     .eq('freigegeben', true)
@@ -73,7 +73,7 @@ export async function getFlohmarktById(id: string): Promise<Flohmarkt | null> {
 
 export async function getAlleFlohmärkte(): Promise<Flohmarkt[]> {
   const { data, error } = await getSupabase()
-    .from('flohmärkte')
+    .from('fm_flea_markets')
     .select('*')
     .eq('freigegeben', true)
     .order('datum', { ascending: true });
@@ -84,7 +84,7 @@ export async function getAlleFlohmärkte(): Promise<Flohmarkt[]> {
 export async function getFeaturedMärkte(limit = 6): Promise<Flohmarkt[]> {
   const today = new Date().toISOString().split('T')[0];
   const { data, error } = await getSupabase()
-    .from('flohmärkte')
+    .from('fm_flea_markets')
     .select('*')
     .eq('freigegeben', true)
     .eq('featured', true)

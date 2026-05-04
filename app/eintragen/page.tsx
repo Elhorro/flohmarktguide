@@ -31,6 +31,7 @@ const schema = z.object({
   uhrzeit_start: z.string().min(1, 'Startzeit ist erforderlich'),
   uhrzeit_ende: z.string().min(1, 'Endzeit ist erforderlich'),
   adresse: z.string().min(3, 'Adresse muss mindestens 3 Zeichen haben'),
+  plz: z.string().max(10).optional(),
   stadt: z.string().min(2, 'Stadt muss mindestens 2 Zeichen haben'),
   beschreibung: z.string().min(10, 'Beschreibung muss mindestens 10 Zeichen haben').max(1000),
   kontakt: z.string().optional(),
@@ -88,6 +89,7 @@ export default function EintragenPage() {
   });
 
   const watchedAdresse = watch('adresse');
+  const watchedPlz = watch('plz');
   const watchedStadt = watch('stadt');
 
   const onSubmit = async (data: FormData) => {
@@ -96,6 +98,7 @@ export default function EintragenPage() {
       const body: Record<string, unknown> = {
         ...data,
         datum: data.datum.toISOString().split('T')[0],
+        plz: data.plz || undefined,
       };
       if (manualCoords) {
         body.lat = manualCoords.lat;
@@ -234,15 +237,26 @@ export default function EintragenPage() {
                   <FieldError message={errors.adresse?.message} />
                 </div>
 
-                {/* Stadt */}
-                <div>
-                  <FieldLabel required>Stadt / Gemeinde</FieldLabel>
-                  <input
-                    {...register('stadt')}
-                    placeholder="z.B. Graz"
-                    className={errors.stadt ? errorInputClass : inputClass}
-                  />
-                  <FieldError message={errors.stadt?.message} />
+                {/* PLZ + Stadt */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <FieldLabel>PLZ</FieldLabel>
+                    <input
+                      {...register('plz')}
+                      placeholder="z.B. 8010"
+                      maxLength={10}
+                      className={inputClass}
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <FieldLabel required>Stadt / Gemeinde</FieldLabel>
+                    <input
+                      {...register('stadt')}
+                      placeholder="z.B. Graz"
+                      className={errors.stadt ? errorInputClass : inputClass}
+                    />
+                    <FieldError message={errors.stadt?.message} />
+                  </div>
                 </div>
 
                 {/* Location Picker (optional) */}
@@ -270,6 +284,7 @@ export default function EintragenPage() {
                       </p>
                       <LocationPicker
                         adresse={watchedAdresse}
+                        plz={watchedPlz}
                         stadt={watchedStadt}
                         onChange={setManualCoords}
                       />
