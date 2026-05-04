@@ -1,0 +1,24 @@
+# Dependencies
+node_modules
+npm-debug.log*
+
+# Next.js build output
+.next
+out
+
+# Git
+.git
+.gitignore
+
+# Env files (werden in Coolify als Env-Vars gesetzt)
+.env
+.env.*
+!.env.local.example
+
+# Docs
+*.md
+!README.md
+
+# Dev tools
+.vscode
+.idea
