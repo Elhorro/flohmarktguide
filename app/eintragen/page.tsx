@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { CircleCheck as CheckCircle, Loader as Loader2, CircleAlert as AlertCircle } from 'lucide-react';
 import Navigation from '@/components/Navigation';
-import { createFlohmarkt } from '@/lib/data';
 import { FlohmarktTyp } from '@/lib/types';
 
 const schema = z.object({
@@ -71,7 +70,15 @@ export default function EintragenPage() {
   const onSubmit = async (data: FormData) => {
     setSubmitError(null);
     try {
-      await createFlohmarkt(data);
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...data,
+          datum: data.datum.toISOString().split('T')[0],
+        }),
+      });
+      if (!res.ok) throw new Error(await res.text());
       setSuccess(true);
       reset();
     } catch {
