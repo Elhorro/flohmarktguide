@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import type { Metadata } from 'next';
 import { ArrowLeft, Calendar, Clock, MapPin, Phone } from 'lucide-react';
 import Link from 'next/link';
 import Navigation from '@/components/Navigation';
@@ -15,6 +16,33 @@ const SmallMap = dynamic(() => import('@/components/map/SmallMap'), {
 
 interface Props {
   params: { id: string };
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const markt = await getFlohmarktById(params.id);
+  if (!markt) return { title: 'Markt nicht gefunden' };
+
+  const datum = new Date(markt.datum + 'T00:00:00').toLocaleDateString('de-AT', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+  const description = `${markt.typ} in ${markt.stadt} am ${datum}. ${markt.adresse}. ${markt.beschreibung.slice(0, 120)}`;
+  const title = `${markt.titel} – ${markt.stadt}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'article',
+    },
+    alternates: {
+      canonical: `/markt/${markt.id}`,
+    },
+  };
 }
 
 function formatDatum(datum: string): string {
