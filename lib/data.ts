@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { getSupabase } from './supabase';
 import { Flohmarkt, FilterOption } from './types';
 
 function getDateRange(filter: FilterOption): { from: string; to: string } | null {
@@ -33,7 +33,7 @@ function getDateRange(filter: FilterOption): { from: string; to: string } | null
 
 function buildFilteredQuery(filter: FilterOption) {
   const today = new Date().toISOString().split('T')[0];
-  let query = supabase
+  let query = getSupabase()
     .from('flohmärkte')
     .select('*')
     .eq('freigegeben', true)
@@ -61,7 +61,7 @@ export async function getNext10Flohmärkte(filter: FilterOption = 'alle'): Promi
 }
 
 export async function getFlohmarktById(id: string): Promise<Flohmarkt | null> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('flohmärkte')
     .select('*')
     .eq('id', id)
@@ -72,7 +72,7 @@ export async function getFlohmarktById(id: string): Promise<Flohmarkt | null> {
 }
 
 export async function getAlleFlohmärkte(): Promise<Flohmarkt[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('flohmärkte')
     .select('*')
     .eq('freigegeben', true)
