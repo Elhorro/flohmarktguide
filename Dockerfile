@@ -1,47 +1,42 @@
-# ─── Stage 1: Dependencies ────────────────────────────────────────────────────
-FROM node:18-alpine AS deps
-RUN apk add --no-cache libc6-compat
+# Multi-stage build für optimale Performance
+FROM node:20-alpine AS dependencies
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci --legacy-peer-deps
+COPY package.json package-lock.json* yarn.lock* pnpm-lock.yaml* ./
+RUN npm ci --only=production || npm install --only=production
 
-# ─── Stage 2: Builder ─────────────────────────────────────────────────────────
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 WORKDIR /app
-
-COPY --from=deps /app/node_modules ./node_modules
+COPY package.json package-lock.json* yarn.lock* pnpm-lock.yaml* ./
+RUN npm ci || npm install
 COPY . .
-
-# NEXT_PUBLIC_* müssen zur Build-Zeit bekannt sein (werden ins JS-Bundle gebacken)
+# Build mit erforderlichen Umgebungsvariablen
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 ARG NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
-ENV NEXT_TELEMETRY_DISABLED=1
-
 RUN npm run build
 
-# ─── Stage 3: Runner ──────────────────────────────────────────────────────────
-FROM node:18-alpine AS runner
+FROM node:20-alpine
 WORKDIR /app
-
 ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
 
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser  --system --uid 1001 nextjs
+# Sicherheit: Non-root User
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
 
-# Standalone-Output von Next.js kopieren
-COPY --from=builder /app/public                          ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static     ./.next/static
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/package.json ./
+
+# Health Check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
 
 USER nextjs
-
 EXPOSE 3000
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+CMD ["npm", "start"]

@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "name": "flohmarktguide",
+    "description": "Flohmarkt Guide - Next.js TypeScript Application",
+    "type": "docker",
+    "port": 3000
+  },
+  "deployment": {
+    "auto_deploy": true,
+    "auto_deploy_branch": "main",
+    "health_check": {
+      "enabled": true,
+      "path": "/",
+      "interval": 30,
+      "timeout": 10
+    }
+  },
+  "environment": {
+    "build_time": [
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      "NEXT_PUBLIC_SITE_URL"
+    ],
+    "runtime": [
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      "NEXT_PUBLIC_SITE_URL",
+      "SUPABASE_SERVICE_ROLE_KEY",
+      "ADMIN_SECRET"
+    ]
+  }
+}
