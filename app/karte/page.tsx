@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { List, Map, ChevronRight, X, Calendar, MapPin, Clock } from 'lucide-react';
+import { List, Map, ChevronRight, X, Calendar, MapPin, Clock, AlertTriangle, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import Navigation from '@/components/Navigation';
 import TypeBadge from '@/components/TypeBadge';
@@ -14,7 +14,7 @@ const MapView = dynamic(() => import('@/components/map/MapView'), {
   loading: () => (
     <div className="w-full h-full bg-stone-100 flex items-center justify-center">
       <div className="text-center">
-        <div className="w-10 h-10 border-3 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <div className="w-10 h-10 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
         <p className="text-stone-500 text-sm">Karte wird geladen...</p>
       </div>
     </div>
@@ -37,13 +37,24 @@ function formatTime(time: string): string {
 export default function KartenAnsicht() {
   const [märkte, setMärkte] = useState<Flohmarkt[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fehler, setFehler] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  useEffect(() => {
+  function laden() {
+    setLoading(true);
+    setFehler(null);
     getAlleFlohmärkte()
       .then(setMärkte)
+      .catch((err: unknown) => {
+        console.error('[KartenAnsicht] Fehler beim Laden:', err);
+        setFehler('Märkte konnten nicht geladen werden. Bitte versuche es nochmal.');
+      })
       .finally(() => setLoading(false));
+  }
+
+  useEffect(() => {
+    laden();
   }, []);
 
   return (
@@ -51,6 +62,7 @@ export default function KartenAnsicht() {
       <Navigation />
 
       <div className="flex flex-1 overflow-hidden relative">
+        {/* Sidebar */}
         <aside
           className={`${
             sidebarOpen ? 'w-80 lg:w-96' : 'w-0'
@@ -60,7 +72,7 @@ export default function KartenAnsicht() {
             <div>
               <h2 className="font-bold text-stone-800 text-base">Alle Märkte</h2>
               <p className="text-xs text-stone-400 mt-0.5">
-                {loading ? '...' : `${märkte.length} Veranstaltungen`}
+                {loading ? '...' : fehler ? 'Fehler beim Laden' : `${märkte.length} Veranstaltungen`}
               </p>
             </div>
             <button
@@ -77,6 +89,22 @@ export default function KartenAnsicht() {
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="h-20 bg-stone-100 rounded-xl animate-pulse" />
                 ))}
+              </div>
+            ) : fehler ? (
+              <div className="p-4 text-center">
+                <AlertTriangle size={28} className="text-orange-400 mx-auto mb-3" />
+                <p className="text-sm text-stone-500 mb-4">{fehler}</p>
+                <button
+                  onClick={laden}
+                  className="flex items-center gap-2 mx-auto bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                >
+                  <RefreshCw size={14} />
+                  Nochmal versuchen
+                </button>
+              </div>
+            ) : märkte.length === 0 ? (
+              <div className="p-4 text-center">
+                <p className="text-sm text-stone-400">Keine Märkte gefunden.</p>
               </div>
             ) : (
               märkte.map((markt) => (
@@ -123,6 +151,7 @@ export default function KartenAnsicht() {
           </div>
         </aside>
 
+        {/* Map area */}
         <div className="flex-1 relative">
           {!sidebarOpen && (
             <button
@@ -144,8 +173,16 @@ export default function KartenAnsicht() {
           </button>
 
           <div className="w-full h-full">
-            {!loading && (
+            {!loading && !fehler && (
               <MapView märkte={märkte} selectedId={selectedId} />
+            )}
+            {!loading && fehler && (
+              <div className="w-full h-full bg-stone-100 flex items-center justify-center">
+                <div className="text-center">
+                  <AlertTriangle size={36} className="text-orange-400 mx-auto mb-3" />
+                  <p className="text-stone-500 text-sm">{fehler}</p>
+                </div>
+              </div>
             )}
           </div>
         </div>

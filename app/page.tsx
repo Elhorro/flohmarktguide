@@ -66,6 +66,7 @@ export default function Startseite() {
     setLoading(true);
     getNext10Flohmärkte(filter)
       .then(setMärkte)
+      .catch(() => setMärkte([]))
       .finally(() => setLoading(false));
   }, [filter]);
 
