@@ -35,9 +35,8 @@ function createCustomIcon() {
   });
 }
 
-function formatDatum(datum: string): string {
-  const date = new Date(datum + 'T00:00:00');
-  return date.toLocaleDateString('de-AT', {
+function formatDatum(date: string): string {
+  return new Date(date + 'T00:00:00').toLocaleDateString('de-AT', {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
@@ -84,10 +83,7 @@ export default function MapView({ märkte, selectedId }: MapViewProps) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <FlyToSelected märkte={märkte} selectedId={selectedId} />
-      <MarkerClusterGroup
-        chunkedLoading
-        maxClusterRadius={60}
-      >
+      <MarkerClusterGroup chunkedLoading maxClusterRadius={60}>
         {märkte.map((markt) => (
           <Marker
             key={markt.id}
@@ -97,19 +93,19 @@ export default function MapView({ märkte, selectedId }: MapViewProps) {
             <Popup className="flohmarkt-popup" maxWidth={280}>
               <div className="p-1">
                 <div className="mb-1">
-                  <TypeBadge typ={markt.typ} size="sm" />
+                  <TypeBadge typ={markt.market_type} size="sm" />
                 </div>
                 <h3 className="font-semibold text-stone-800 text-sm leading-snug mb-1">
                   {markt.titel}
                 </h3>
                 <p className="text-xs text-stone-500 mb-0.5">
-                  {formatDatum(markt.datum)}
+                  {formatDatum(markt.date)}
                 </p>
                 <p className="text-xs text-stone-500 mb-0.5">
-                  {formatTime(markt.uhrzeit_start)} – {formatTime(markt.uhrzeit_ende)} Uhr
+                  {formatTime(markt.time_start)} – {formatTime(markt.time_end)} Uhr
                 </p>
                 <p className="text-xs text-stone-500 mb-2">
-                  {markt.adresse}, {markt.stadt}
+                  {markt.address}{markt.plz ? ` ${markt.plz}` : ''} {markt.location_name}
                 </p>
                 <Link
                   href={`/markt/${markt.id}`}

@@ -22,21 +22,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const markt = await getFlohmarktById(params.id);
   if (!markt) return { title: 'Markt nicht gefunden' };
 
-  const datum = new Date(markt.datum + 'T00:00:00').toLocaleDateString('de-AT', {
+  const datum = new Date(markt.date + 'T00:00:00').toLocaleDateString('de-AT', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
-  const description = `${markt.typ} in ${markt.stadt} am ${datum}. ${markt.adresse}. ${markt.beschreibung.slice(0, 120)}`;
-  const title = `${markt.titel} – ${markt.stadt}`;
+  const descriptionText = `${markt.market_type} in ${markt.location_name} am ${datum}. ${markt.address}. ${markt.description.slice(0, 120)}`;
+  const title = `${markt.titel} – ${markt.location_name}`;
 
   return {
     title,
-    description,
+    description: descriptionText,
     openGraph: {
       title,
-      description,
+      description: descriptionText,
       type: 'article',
     },
     alternates: {
@@ -45,8 +45,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-function formatDatum(datum: string): string {
-  return new Date(datum + 'T00:00:00').toLocaleDateString('de-AT', {
+function formatDatum(date: string): string {
+  return new Date(date + 'T00:00:00').toLocaleDateString('de-AT', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -79,7 +79,7 @@ export default async function MarktDetailPage({ params }: Props) {
           <div className="bg-white rounded-3xl border border-stone-100 overflow-hidden shadow-sm">
             <div className="bg-gradient-to-br from-orange-50 to-amber-50 px-6 sm:px-8 pt-8 pb-6 border-b border-orange-100">
               <div className="mb-3">
-                <TypeBadge typ={markt.typ} size="md" />
+                <TypeBadge typ={markt.market_type} size="md" />
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold text-stone-800 leading-tight">
                 {markt.titel}
@@ -94,7 +94,7 @@ export default async function MarktDetailPage({ params }: Props) {
                   </div>
                   <div>
                     <p className="text-xs text-stone-400 font-medium mb-0.5">Datum</p>
-                    <p className="font-semibold text-stone-800 text-sm">{formatDatum(markt.datum)}</p>
+                    <p className="font-semibold text-stone-800 text-sm">{formatDatum(markt.date)}</p>
                   </div>
                 </div>
 
@@ -105,7 +105,7 @@ export default async function MarktDetailPage({ params }: Props) {
                   <div>
                     <p className="text-xs text-stone-400 font-medium mb-0.5">Uhrzeit</p>
                     <p className="font-semibold text-stone-800 text-sm">
-                      {formatTime(markt.uhrzeit_start)} – {formatTime(markt.uhrzeit_ende)} Uhr
+                      {formatTime(markt.time_start)} – {formatTime(markt.time_end)} Uhr
                     </p>
                   </div>
                 </div>
@@ -116,28 +116,30 @@ export default async function MarktDetailPage({ params }: Props) {
                   </div>
                   <div>
                     <p className="text-xs text-stone-400 font-medium mb-0.5">Adresse</p>
-                    <p className="font-semibold text-stone-800 text-sm">{markt.adresse}</p>
-                    <p className="text-stone-500 text-sm">{markt.stadt}</p>
+                    <p className="font-semibold text-stone-800 text-sm">{markt.address}</p>
+                    <p className="text-stone-500 text-sm">
+                      {markt.plz ? `${markt.plz} ` : ''}{markt.location_name}
+                    </p>
                   </div>
                 </div>
 
-                {markt.kontakt && (
+                {markt.organizer_contact && (
                   <div className="flex items-start gap-3 p-4 bg-stone-50 rounded-xl sm:col-span-2">
                     <div className="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
                       <Phone size={18} className="text-green-600" />
                     </div>
                     <div>
                       <p className="text-xs text-stone-400 font-medium mb-0.5">Kontakt</p>
-                      <p className="font-semibold text-stone-800 text-sm">{markt.kontakt}</p>
+                      <p className="font-semibold text-stone-800 text-sm">{markt.organizer_contact}</p>
                     </div>
                   </div>
                 )}
               </div>
 
-              {markt.beschreibung && (
+              {markt.description && (
                 <div className="mb-6">
                   <h2 className="font-semibold text-stone-700 text-sm mb-2">Beschreibung</h2>
-                  <p className="text-stone-600 leading-relaxed text-sm">{markt.beschreibung}</p>
+                  <p className="text-stone-600 leading-relaxed text-sm">{markt.description}</p>
                 </div>
               )}
 

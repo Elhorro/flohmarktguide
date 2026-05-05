@@ -28,7 +28,7 @@ function FeaturedCard({ markt }: { markt: Flohmarkt }) {
       <div className="p-4">
         <div className="flex items-start justify-between gap-2 mb-2">
           <span className="text-xs font-semibold bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full">
-            {markt.typ}
+            {markt.market_type}
           </span>
           <Star size={14} className="text-amber-400 shrink-0 mt-0.5" fill="currentColor" />
         </div>
@@ -38,11 +38,11 @@ function FeaturedCard({ markt }: { markt: Flohmarkt }) {
         <div className="space-y-1">
           <p className="text-xs text-stone-500 flex items-center gap-1.5">
             <Calendar size={11} className="text-stone-400" />
-            {formatDatumShort(markt.datum)} · {markt.uhrzeit_start.slice(0, 5)} Uhr
+            {formatDatumShort(markt.date)} · {markt.time_start.slice(0, 5)} Uhr
           </p>
           <p className="text-xs text-stone-500 flex items-center gap-1.5">
             <MapPin size={11} className="text-stone-400" />
-            {markt.stadt}
+            {markt.location_name}
           </p>
         </div>
       </div>

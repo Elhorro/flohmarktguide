@@ -120,21 +120,21 @@ export default function KartenAnsicht() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
                       <div className="mb-1">
-                        <TypeBadge typ={markt.typ} size="sm" />
+                        <TypeBadge typ={markt.market_type} size="sm" />
                       </div>
                       <p className="font-semibold text-stone-800 text-sm leading-snug truncate">
                         {markt.titel}
                       </p>
                       <div className="flex items-center gap-1 mt-1 text-xs text-stone-400">
                         <Calendar size={10} />
-                        <span>{formatDatum(markt.datum)}</span>
+                        <span>{formatDatum(markt.date)}</span>
                         <span className="mx-1">·</span>
                         <Clock size={10} />
-                        <span>{formatTime(markt.uhrzeit_start)}</span>
+                        <span>{formatTime(markt.time_start)}</span>
                       </div>
                       <div className="flex items-center gap-1 mt-0.5 text-xs text-stone-400">
                         <MapPin size={10} />
-                        <span className="truncate">{markt.stadt}</span>
+                        <span className="truncate">{markt.location_name}</span>
                       </div>
                     </div>
                     <Link

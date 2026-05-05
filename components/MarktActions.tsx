@@ -5,14 +5,14 @@ import { Calendar, Share2, Navigation as NavIcon, ExternalLink } from 'lucide-re
 import { Flohmarkt } from '@/lib/types';
 
 function buildGoogleMapsUrl(markt: Flohmarkt): string {
-  const q = encodeURIComponent(`${markt.adresse}, ${markt.stadt}, Austria`);
+  const q = encodeURIComponent(`${markt.address}, ${markt.location_name}, Austria`);
   return `https://www.google.com/maps/search/?api=1&query=${q}`;
 }
 
 function buildICSContent(markt: Flohmarkt): string {
-  const [y, m, d] = markt.datum.split('-');
-  const [sh, sm] = markt.uhrzeit_start.split(':');
-  const [eh, em] = markt.uhrzeit_ende.split(':');
+  const [y, m, d] = markt.date.split('-');
+  const [sh, sm] = markt.time_start.split(':');
+  const [eh, em] = markt.time_end.split(':');
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
@@ -20,8 +20,8 @@ function buildICSContent(markt: Flohmarkt): string {
     `SUMMARY:${markt.titel}`,
     `DTSTART:${y}${m}${d}T${sh}${sm}00`,
     `DTEND:${y}${m}${d}T${eh}${em}00`,
-    `LOCATION:${markt.adresse}, ${markt.stadt}`,
-    `DESCRIPTION:${markt.beschreibung.replace(/\n/g, '\n')}`,
+    `LOCATION:${markt.address}, ${markt.location_name}`,
+    `DESCRIPTION:${markt.description.replace(/\n/g, '\\n')}`,
     'END:VEVENT',
     'END:VCALENDAR',
   ].join('\r\n');
@@ -35,7 +35,7 @@ export default function MarktActions({ markt }: { markt: Flohmarkt }) {
       try {
         await navigator.share({
           title: markt.titel,
-          text: `${markt.titel} in ${markt.stadt}`,
+          text: `${markt.titel} in ${markt.location_name}`,
           url: window.location.href,
         });
       } catch {

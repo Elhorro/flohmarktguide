@@ -3,9 +3,8 @@ import { Calendar, MapPin, Clock, ChevronRight } from 'lucide-react';
 import { Flohmarkt } from '@/lib/types';
 import TypeBadge from './TypeBadge';
 
-function formatDatum(datum: string): string {
-  const date = new Date(datum + 'T00:00:00');
-  return date.toLocaleDateString('de-AT', {
+function formatDatum(date: string): string {
+  return new Date(date + 'T00:00:00').toLocaleDateString('de-AT', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -33,7 +32,7 @@ export default function MarktCard({ markt, compact = false }: MarktCardProps) {
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <TypeBadge typ={markt.typ} />
+            <TypeBadge typ={markt.market_type} />
           </div>
           <h3
             className={`font-semibold text-stone-800 group-hover:text-orange-600 transition-colors leading-snug ${
@@ -46,18 +45,18 @@ export default function MarktCard({ markt, compact = false }: MarktCardProps) {
           <div className={`mt-2 space-y-1 ${compact ? 'text-xs' : 'text-sm'}`}>
             <div className="flex items-center gap-1.5 text-stone-500">
               <Calendar size={compact ? 12 : 13} className="shrink-0 text-orange-400" />
-              <span>{formatDatum(markt.datum)}</span>
+              <span>{formatDatum(markt.date)}</span>
             </div>
             <div className="flex items-center gap-1.5 text-stone-500">
               <Clock size={compact ? 12 : 13} className="shrink-0 text-orange-400" />
               <span>
-                {formatTime(markt.uhrzeit_start)} – {formatTime(markt.uhrzeit_ende)} Uhr
+                {formatTime(markt.time_start)} – {formatTime(markt.time_end)} Uhr
               </span>
             </div>
             <div className="flex items-center gap-1.5 text-stone-500">
               <MapPin size={compact ? 12 : 13} className="shrink-0 text-orange-400" />
               <span className="truncate">
-                {markt.adresse}, {markt.stadt}
+                {markt.address}{markt.plz ? `, ${markt.plz}` : ''} {markt.location_name}
               </span>
             </div>
           </div>
@@ -70,9 +69,9 @@ export default function MarktCard({ markt, compact = false }: MarktCardProps) {
         </div>
       </div>
 
-      {!compact && markt.beschreibung && (
+      {!compact && markt.description && (
         <p className="mt-3 text-sm text-stone-400 line-clamp-2 leading-relaxed">
-          {markt.beschreibung}
+          {markt.description}
         </p>
       )}
     </Link>

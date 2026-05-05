@@ -12,8 +12,8 @@ interface AdminPanelProps {
   adminSecret: string;
 }
 
-function formatDatum(datum: string) {
-  return new Date(datum + 'T00:00:00').toLocaleDateString('de-AT', {
+function formatDatum(date: string) {
+  return new Date(date + 'T00:00:00').toLocaleDateString('de-AT', {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
@@ -45,8 +45,8 @@ export default function AdminPanel({ märkte, adminSecret }: AdminPanelProps) {
     return base.filter(
       (m) =>
         m.titel.toLowerCase().includes(q) ||
-        m.stadt.toLowerCase().includes(q) ||
-        m.typ.toLowerCase().includes(q),
+        m.location_name.toLowerCase().includes(q) ||
+        m.market_type.toLowerCase().includes(q),
     );
   }, [tab, search, märkte, pending, approved]);
 
@@ -175,10 +175,10 @@ export default function AdminPanel({ märkte, adminSecret }: AdminPanelProps) {
                     <div className="flex items-center gap-2 flex-wrap mb-1.5">
                       <span
                         className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
-                          typColors[markt.typ] ?? 'bg-stone-100 text-stone-600'
+                          typColors[markt.market_type] ?? 'bg-stone-100 text-stone-600'
                         }`}
                       >
-                        {markt.typ}
+                        {markt.market_type}
                       </span>
                       {!markt.freigegeben && (
                         <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
@@ -194,14 +194,14 @@ export default function AdminPanel({ märkte, adminSecret }: AdminPanelProps) {
                     </div>
                     <h3 className="font-bold text-stone-800 text-base truncate">{markt.titel}</h3>
                     <p className="text-sm text-stone-500 mt-0.5">
-                      📅 {formatDatum(markt.datum)} · ⏰ {markt.uhrzeit_start.slice(0, 5)}–
-                      {markt.uhrzeit_ende.slice(0, 5)} Uhr
+                      📅 {formatDatum(markt.date)} · ⏰ {markt.time_start.slice(0, 5)}–
+                      {markt.time_end.slice(0, 5)} Uhr
                     </p>
                     <p className="text-sm text-stone-500">
-                      📍 {markt.adresse}, {markt.stadt}
+                      📍 {markt.address}{markt.plz ? ` ${markt.plz}` : ''} {markt.location_name}
                     </p>
-                    {markt.kontakt && (
-                      <p className="text-sm text-stone-400 mt-0.5">📞 {markt.kontakt}</p>
+                    {markt.organizer_contact && (
+                      <p className="text-sm text-stone-400 mt-0.5">📞 {markt.organizer_contact}</p>
                     )}
                   </div>
 
@@ -258,7 +258,7 @@ export default function AdminPanel({ märkte, adminSecret }: AdminPanelProps) {
                 </div>
 
                 <p className="text-xs text-stone-400 mt-3 line-clamp-2 border-t border-stone-50 pt-2">
-                  {markt.beschreibung}
+                  {markt.description}
                 </p>
               </div>
             );

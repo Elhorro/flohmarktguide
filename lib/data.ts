@@ -37,13 +37,13 @@ function buildFilteredQuery(filter: FilterOption) {
     .from('fm_flea_markets')
     .select('*')
     .eq('freigegeben', true)
-    .order('datum', { ascending: true });
+    .order('date', { ascending: true });
 
   const range = getDateRange(filter);
   if (range) {
-    query = query.gte('datum', range.from).lte('datum', range.to);
+    query = query.gte('date', range.from).lte('date', range.to);
   } else {
-    query = query.gte('datum', today);
+    query = query.gte('date', today);
   }
   return query;
 }
@@ -76,7 +76,7 @@ export async function getAlleFlohmärkte(): Promise<Flohmarkt[]> {
     .from('fm_flea_markets')
     .select('*')
     .eq('freigegeben', true)
-    .order('datum', { ascending: true });
+    .order('date', { ascending: true });
   if (error) throw error;
   return data ?? [];
 }
@@ -88,8 +88,8 @@ export async function getFeaturedMärkte(limit = 6): Promise<Flohmarkt[]> {
     .select('*')
     .eq('freigegeben', true)
     .eq('featured', true)
-    .gte('datum', today)
-    .order('datum', { ascending: true })
+    .gte('date', today)
+    .order('date', { ascending: true })
     .limit(limit);
   if (error) throw error;
   return data ?? [];

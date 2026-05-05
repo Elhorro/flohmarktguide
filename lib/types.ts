@@ -3,22 +3,23 @@ export type FlohmarktTyp = 'Flohmarkt' | 'Fetzenmarkt' | 'Hausflohmarkt' | 'Anti
 export interface Flohmarkt {
   id: string;
   titel: string;
-  typ: FlohmarktTyp;
-  datum: string;
-  uhrzeit_start: string;
-  uhrzeit_ende: string;
-  adresse: string;
+  market_type: FlohmarktTyp;
+  date: string;
+  time_start: string;
+  time_end: string;
+  address: string;
   plz?: string | null;
-  stadt: string;
-  beschreibung: string;
-  kontakt?: string | null;
+  location_name: string;
+  description: string;
+  organizer_contact?: string | null;
   lat: number;
   lng: number;
   freigegeben: boolean;
   featured: boolean;
-  erstellt_am: string;
+  created_at: string;
 }
 
+/** Used by the submission form (German field names = form-side, not DB) */
 export interface FlohmarktFormData {
   titel: string;
   typ: FlohmarktTyp;
@@ -26,6 +27,7 @@ export interface FlohmarktFormData {
   uhrzeit_start: string;
   uhrzeit_ende: string;
   adresse: string;
+  plz?: string;
   stadt: string;
   beschreibung: string;
   kontakt?: string;
@@ -40,38 +42,38 @@ export type Database = {
         Row: {
           id: string;
           titel: string;
-          typ: FlohmarktTyp;
-          datum: string;
-          uhrzeit_start: string;
-          uhrzeit_ende: string;
-          adresse: string;
+          market_type: FlohmarktTyp;
+          date: string;
+          time_start: string;
+          time_end: string;
+          address: string;
           plz: string | null;
-          stadt: string;
-          beschreibung: string;
-          kontakt: string | null;
+          location_name: string;
+          description: string;
+          organizer_contact: string | null;
           lat: number;
           lng: number;
           freigegeben: boolean;
           featured: boolean;
-          erstellt_am: string;
+          created_at: string;
         };
         Insert: {
           id?: string;
           titel: string;
-          typ: FlohmarktTyp;
-          datum: string;
-          uhrzeit_start?: string;
-          uhrzeit_ende?: string;
-          adresse?: string;
+          market_type: FlohmarktTyp;
+          date: string;
+          time_start?: string;
+          time_end?: string;
+          address?: string;
           plz?: string | null;
-          stadt?: string;
-          beschreibung?: string;
-          kontakt?: string | null;
+          location_name?: string;
+          description?: string;
+          organizer_contact?: string | null;
           lat?: number;
           lng?: number;
           freigegeben?: boolean;
           featured?: boolean;
-          erstellt_am?: string;
+          created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['fm_flea_markets']['Insert']>;
         Relationships: [];

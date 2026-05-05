@@ -53,7 +53,7 @@ export default async function AdminPage({
   const { data: märkte, error } = await supabase
     .from('fm_flea_markets')
     .select('*')
-    .order('erstellt_am', { ascending: false });
+    .order('created_at', { ascending: false });
 
   if (error) {
     return (
