@@ -42,7 +42,7 @@ export default async function AdminPage({
             Bitte mit korrektem Secret aufrufen:
           </p>
           <code className="block bg-stone-50 border border-stone-200 rounded-lg px-4 py-2.5 text-xs font-mono text-stone-600 mt-3">
-            /admin?secret=DEIN_ADMIN_SECRET
+            /admin?secret=IHR_PASSWORT
           </code>
         </div>
       </div>
