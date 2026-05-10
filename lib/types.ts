@@ -2,7 +2,7 @@ export type FlohmarktTyp = 'Flohmarkt' | 'Fetzenmarkt' | 'Hausflohmarkt' | 'Anti
 
 export interface Flohmarkt {
   id: string;
-  titel: string;
+  title: string;
   market_type: FlohmarktTyp;
   date: string;
   time_start: string;
@@ -41,7 +41,7 @@ export type Database = {
       fm_flea_markets: {
         Row: {
           id: string;
-          titel: string;
+          title: string;
           market_type: FlohmarktTyp;
           date: string;
           time_start: string;
@@ -59,7 +59,7 @@ export type Database = {
         };
         Insert: {
           id?: string;
-          titel: string;
+          title: string;
           market_type: FlohmarktTyp;
           date: string;
           time_start?: string;

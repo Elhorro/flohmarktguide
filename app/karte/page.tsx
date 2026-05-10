@@ -123,7 +123,7 @@ export default function KartenAnsicht() {
                         <TypeBadge typ={markt.market_type} size="sm" />
                       </div>
                       <p className="font-semibold text-stone-800 text-sm leading-snug truncate">
-                        {markt.titel}
+                        {markt.title}
                       </p>
                       <div className="flex items-center gap-1 mt-1 text-xs text-stone-400">
                         <Calendar size={10} />

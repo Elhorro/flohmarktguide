@@ -96,7 +96,7 @@ export default function MapView({ märkte, selectedId }: MapViewProps) {
                   <TypeBadge typ={markt.market_type} size="sm" />
                 </div>
                 <h3 className="font-semibold text-stone-800 text-sm leading-snug mb-1">
-                  {markt.titel}
+                  {markt.title}
                 </h3>
                 <p className="text-xs text-stone-500 mb-0.5">
                   {formatDatum(markt.date)}

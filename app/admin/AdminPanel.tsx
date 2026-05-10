@@ -44,7 +44,7 @@ export default function AdminPanel({ märkte, adminSecret }: AdminPanelProps) {
     const q = search.toLowerCase();
     return base.filter(
       (m) =>
-        m.titel.toLowerCase().includes(q) ||
+        m.title.toLowerCase().includes(q) ||
         m.location_name.toLowerCase().includes(q) ||
         m.market_type.toLowerCase().includes(q),
     );
@@ -192,7 +192,7 @@ export default function AdminPanel({ märkte, adminSecret }: AdminPanelProps) {
                         </span>
                       )}
                     </div>
-                    <h3 className="font-bold text-stone-800 text-base truncate">{markt.titel}</h3>
+                    <h3 className="font-bold text-stone-800 text-base truncate">{markt.title}</h3>
                     <p className="text-sm text-stone-500 mt-0.5">
                       📅 {formatDatum(markt.date)} · ⏰ {markt.time_start.slice(0, 5)}–
                       {markt.time_end.slice(0, 5)} Uhr

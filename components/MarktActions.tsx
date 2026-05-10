@@ -17,7 +17,7 @@ function buildICSContent(markt: Flohmarkt): string {
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
     'BEGIN:VEVENT',
-    `SUMMARY:${markt.titel}`,
+    `SUMMARY:${markt.title}`,
     `DTSTART:${y}${m}${d}T${sh}${sm}00`,
     `DTEND:${y}${m}${d}T${eh}${em}00`,
     `LOCATION:${markt.address}, ${markt.location_name}`,
@@ -34,8 +34,8 @@ export default function MarktActions({ markt }: { markt: Flohmarkt }) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: markt.titel,
-          text: `${markt.titel} in ${markt.location_name}`,
+          title: markt.title,
+          text: `${markt.title} in ${markt.location_name}`,
           url: window.location.href,
         });
       } catch {
@@ -53,7 +53,7 @@ export default function MarktActions({ markt }: { markt: Flohmarkt }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${markt.titel.replace(/\s+/g, '_')}.ics`;
+    a.download = `${markt.title.replace(/\s+/g, '_')}.ics`;
     a.click();
     URL.revokeObjectURL(url);
   };

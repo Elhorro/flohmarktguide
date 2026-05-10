@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     year: 'numeric',
   });
   const descriptionText = `${markt.market_type} in ${markt.location_name} am ${datum}. ${markt.address}. ${markt.description.slice(0, 120)}`;
-  const title = `${markt.titel} – ${markt.location_name}`;
+  const title = `${markt.title} – ${markt.location_name}`;
 
   return {
     title,
@@ -82,7 +82,7 @@ export default async function MarktDetailPage({ params }: Props) {
                 <TypeBadge typ={markt.market_type} size="md" />
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold text-stone-800 leading-tight">
-                {markt.titel}
+                {markt.title}
               </h1>
             </div>
 
@@ -144,7 +144,7 @@ export default async function MarktDetailPage({ params }: Props) {
               )}
 
               <div className="h-52 sm:h-64 rounded-2xl overflow-hidden mb-6 border border-stone-100">
-                <SmallMap lat={markt.lat} lng={markt.lng} titel={markt.titel} />
+                <SmallMap lat={markt.lat} lng={markt.lng} titel={markt.title} />
               </div>
 
               <MarktActions markt={markt} />

@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
 
   const { error } = await supabase.from('fm_flea_markets').insert([
     {
-      titel: d.titel,
+      title: d.titel,
       market_type: d.typ,
       date: d.datum,
       time_start: d.uhrzeit_start,

@@ -33,7 +33,7 @@ function FeaturedCard({ markt }: { markt: Flohmarkt }) {
           <Star size={14} className="text-amber-400 shrink-0 mt-0.5" fill="currentColor" />
         </div>
         <h3 className="font-bold text-stone-800 text-sm leading-snug mb-2 group-hover:text-orange-600 transition-colors line-clamp-2">
-          {markt.titel}
+          {markt.title}
         </h3>
         <div className="space-y-1">
           <p className="text-xs text-stone-500 flex items-center gap-1.5">

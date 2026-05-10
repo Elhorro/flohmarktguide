@@ -39,7 +39,7 @@ export default function MarktCard({ markt, compact = false }: MarktCardProps) {
               compact ? 'text-sm' : 'text-base'
             }`}
           >
-            {markt.titel}
+            {markt.title}
           </h3>
 
           <div className={`mt-2 space-y-1 ${compact ? 'text-xs' : 'text-sm'}`}>
