@@ -12,13 +12,18 @@ interface AdminPanelProps {
   adminSecret: string;
 }
 
-function formatDatum(date: string) {
+function formatDatum(date: string | null | undefined) {
+  if (!date) return '–';
   return new Date(date + 'T00:00:00').toLocaleDateString('de-AT', {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
     year: 'numeric',
   });
+}
+
+function formatTime(time: string | null | undefined): string {
+  return time?.slice(0, 5) ?? '--:--';
 }
 
 const typColors: Record<string, string> = {
@@ -194,8 +199,7 @@ export default function AdminPanel({ märkte, adminSecret }: AdminPanelProps) {
                     </div>
                     <h3 className="font-bold text-stone-800 text-base truncate">{markt.title}</h3>
                     <p className="text-sm text-stone-500 mt-0.5">
-                      📅 {formatDatum(markt.date)} · ⏰ {markt.time_start.slice(0, 5)}–
-                      {markt.time_end.slice(0, 5)} Uhr
+                      📅 {formatDatum(markt.date)} · ⏰ {formatTime(markt.time_start)}–{formatTime(markt.time_end)} Uhr
                     </p>
                     <p className="text-sm text-stone-500">
                       📍 {markt.address}{markt.plz ? ` ${markt.plz}` : ''} {markt.location_name}

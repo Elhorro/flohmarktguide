@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     month: 'long',
     year: 'numeric',
   });
-  const descriptionText = `${markt.market_type} in ${markt.location_name} am ${datum}. ${markt.address}. ${markt.description.slice(0, 120)}`;
+  const descriptionText = `${markt.market_type} in ${markt.location_name} am ${datum}. ${markt.address ?? ''}. ${(markt.description ?? '').slice(0, 120)}`;
   const title = `${markt.title} – ${markt.location_name}`;
 
   return {
@@ -54,8 +54,8 @@ function formatDatum(date: string): string {
   });
 }
 
-function formatTime(time: string): string {
-  return time.slice(0, 5);
+function formatTime(time: string | null | undefined): string {
+  return time?.slice(0, 5) ?? '--:--';
 }
 
 export default async function MarktDetailPage({ params }: Props) {

@@ -35,7 +35,8 @@ function createCustomIcon() {
   });
 }
 
-function formatDatum(date: string): string {
+function formatDatum(date: string | null | undefined): string {
+  if (!date) return '–';
   return new Date(date + 'T00:00:00').toLocaleDateString('de-AT', {
     weekday: 'short',
     day: 'numeric',
@@ -44,8 +45,8 @@ function formatDatum(date: string): string {
   });
 }
 
-function formatTime(time: string): string {
-  return time.slice(0, 5);
+function formatTime(time: string | null | undefined): string {
+  return time?.slice(0, 5) ?? '--:--';
 }
 
 interface MapViewProps {

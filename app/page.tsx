@@ -9,12 +9,17 @@ import QuickFilter from '@/components/QuickFilter';
 import { Flohmarkt, FilterOption } from '@/lib/types';
 import { getNext10Flohmärkte, getFeaturedMärkte } from '@/lib/data';
 
-function formatDatumShort(datum: string) {
+function formatDatumShort(datum: string | null | undefined) {
+  if (!datum) return '–';
   return new Date(datum + 'T00:00:00').toLocaleDateString('de-AT', {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
   });
+}
+
+function safeSlice(val: string | null | undefined, end: number): string {
+  return val?.slice(0, end) ?? '--:--';
 }
 
 function FeaturedCard({ markt }: { markt: Flohmarkt }) {
@@ -38,7 +43,7 @@ function FeaturedCard({ markt }: { markt: Flohmarkt }) {
         <div className="space-y-1">
           <p className="text-xs text-stone-500 flex items-center gap-1.5">
             <Calendar size={11} className="text-stone-400" />
-            {formatDatumShort(markt.date)} · {markt.time_start.slice(0, 5)} Uhr
+            {formatDatumShort(markt.date)} · {safeSlice(markt.time_start, 5)} Uhr
           </p>
           <p className="text-xs text-stone-500 flex items-center gap-1.5">
             <MapPin size={11} className="text-stone-400" />

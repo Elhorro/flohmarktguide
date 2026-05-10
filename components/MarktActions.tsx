@@ -10,9 +10,9 @@ function buildGoogleMapsUrl(markt: Flohmarkt): string {
 }
 
 function buildICSContent(markt: Flohmarkt): string {
-  const [y, m, d] = markt.date.split('-');
-  const [sh, sm] = markt.time_start.split(':');
-  const [eh, em] = markt.time_end.split(':');
+  const [y, m, d] = (markt.date ?? '2000-01-01').split('-');
+  const [sh, sm] = (markt.time_start ?? '00:00').split(':');
+  const [eh, em] = (markt.time_end ?? '00:00').split(':');
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
@@ -20,8 +20,8 @@ function buildICSContent(markt: Flohmarkt): string {
     `SUMMARY:${markt.title}`,
     `DTSTART:${y}${m}${d}T${sh}${sm}00`,
     `DTEND:${y}${m}${d}T${eh}${em}00`,
-    `LOCATION:${markt.address}, ${markt.location_name}`,
-    `DESCRIPTION:${markt.description.replace(/\n/g, '\\n')}`,
+    `LOCATION:${markt.address ?? ''}, ${markt.location_name}`,
+    `DESCRIPTION:${(markt.description ?? '').replace(/\n/g, '\\n')}`,
     'END:VEVENT',
     'END:VCALENDAR',
   ].join('\r\n');

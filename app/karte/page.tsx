@@ -21,7 +21,8 @@ const MapView = dynamic(() => import('@/components/map/MapView'), {
   ),
 });
 
-function formatDatum(datum: string): string {
+function formatDatum(datum: string | null | undefined): string {
+  if (!datum) return '–';
   const date = new Date(datum + 'T00:00:00');
   return date.toLocaleDateString('de-AT', {
     weekday: 'short',
@@ -30,8 +31,8 @@ function formatDatum(datum: string): string {
   });
 }
 
-function formatTime(time: string): string {
-  return time.slice(0, 5);
+function formatTime(time: string | null | undefined): string {
+  return time?.slice(0, 5) ?? '--:--';
 }
 
 export default function KartenAnsicht() {
