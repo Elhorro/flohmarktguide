@@ -2,7 +2,11 @@
 
 import { useEffect } from 'react';
 import { MapContainer, TileLayer, Popup, useMap } from 'react-leaflet';
-import MarkerClusterGroup from 'react-leaflet-cluster';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+import MarkerClusterGroupImport from 'react-leaflet-cluster';
+// Handle both ESM default and CJS module.exports shapes
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const MarkerClusterGroup = (MarkerClusterGroupImport as any).default ?? MarkerClusterGroupImport;
 import { Marker } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';

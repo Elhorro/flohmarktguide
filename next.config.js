@@ -5,6 +5,8 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Transpile ESM/CJS mixed packages so webpack bundles them correctly
+  transpilePackages: ['react-leaflet-cluster'],
 };
 
 module.exports = nextConfig;
