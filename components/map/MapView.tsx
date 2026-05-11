@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Popup, useMap } from 'react-leaflet';
-import { Marker } from 'react-leaflet';
+import { useEffect } from 'react';
+import { MapContainer, TileLayer, Popup, useMap, Marker } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Flohmarkt } from '@/lib/types';
