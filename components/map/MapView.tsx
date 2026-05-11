@@ -1,12 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Popup, useMap } from 'react-leaflet';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-import MarkerClusterGroupImport from 'react-leaflet-cluster';
-// Handle both ESM default and CJS module.exports shapes
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const MarkerClusterGroup = (MarkerClusterGroupImport as any).default ?? MarkerClusterGroupImport;
 import { Marker } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -64,7 +59,7 @@ function FlyToSelected({ märkte, selectedId }: { märkte: Flohmarkt[]; selected
   useEffect(() => {
     if (selectedId) {
       const markt = märkte.find((m) => m.id === selectedId);
-      if (markt) {
+      if (markt && markt.lat && markt.lng) {
         map.flyTo([markt.lat, markt.lng], 14, { duration: 1.2 });
       }
     }
@@ -88,8 +83,9 @@ export default function MapView({ märkte, selectedId }: MapViewProps) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <FlyToSelected märkte={märkte} selectedId={selectedId} />
-      <MarkerClusterGroup chunkedLoading maxClusterRadius={60}>
-        {märkte.map((markt) => (
+      {märkte.map((markt) => {
+        if (!markt.lat || !markt.lng) return null;
+        return (
           <Marker
             key={markt.id}
             position={[markt.lat, markt.lng]}
@@ -121,8 +117,8 @@ export default function MapView({ märkte, selectedId }: MapViewProps) {
               </div>
             </Popup>
           </Marker>
-        ))}
-      </MarkerClusterGroup>
+        );
+      })}
     </MapContainer>
   );
 }
