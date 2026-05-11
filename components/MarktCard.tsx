@@ -2,20 +2,7 @@ import Link from 'next/link';
 import { Calendar, MapPin, Clock, ChevronRight } from 'lucide-react';
 import { Flohmarkt } from '@/lib/types';
 import TypeBadge from './TypeBadge';
-
-function formatDatum(date: string | null | undefined): string {
-  if (!date) return '–';
-  return new Date(date + 'T00:00:00').toLocaleDateString('de-AT', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-}
-
-function formatTime(time: string | null | undefined): string {
-  return time?.slice(0, 5) ?? '--:--';
-}
+import { formatDateRange, formatTime } from '@/lib/format';
 
 interface MarktCardProps {
   markt: Flohmarkt;
@@ -46,7 +33,7 @@ export default function MarktCard({ markt, compact = false }: MarktCardProps) {
           <div className={`mt-2 space-y-1 ${compact ? 'text-xs' : 'text-sm'}`}>
             <div className="flex items-center gap-1.5 text-stone-500">
               <Calendar size={compact ? 12 : 13} className="shrink-0 text-orange-400" />
-              <span>{formatDatum(markt.date)}</span>
+              <span>{formatDateRange(markt.date, markt.date_end, { withYear: true, weekday: true })}</span>
             </div>
             <div className="flex items-center gap-1.5 text-stone-500">
               <Clock size={compact ? 12 : 13} className="shrink-0 text-orange-400" />

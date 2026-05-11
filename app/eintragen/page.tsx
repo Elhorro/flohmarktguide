@@ -24,18 +24,24 @@ const LocationPicker = dynamic(() => import('@/components/LocationPicker'), {
   ),
 });
 
-const schema = z.object({
-  titel: z.string().min(3, 'Titel muss mindestens 3 Zeichen haben'),
-  typ: z.enum(['Flohmarkt', 'Fetzenmarkt', 'Hausflohmarkt', 'Antikmarkt'] as const),
-  datum: z.date({ required_error: 'Bitte ein Datum wählen' }),
-  uhrzeit_start: z.string().min(1, 'Startzeit ist erforderlich'),
-  uhrzeit_ende: z.string().min(1, 'Endzeit ist erforderlich'),
-  adresse: z.string().min(3, 'Adresse muss mindestens 3 Zeichen haben'),
-  plz: z.string().max(10).optional(),
-  stadt: z.string().min(2, 'Stadt muss mindestens 2 Zeichen haben'),
-  beschreibung: z.string().min(10, 'Beschreibung muss mindestens 10 Zeichen haben').max(1000),
-  kontakt: z.string().optional(),
-});
+const schema = z
+  .object({
+    titel: z.string().min(3, 'Titel muss mindestens 3 Zeichen haben'),
+    typ: z.enum(['Flohmarkt', 'Fetzenmarkt', 'Hausflohmarkt', 'Antikmarkt'] as const),
+    datum: z.date({ required_error: 'Bitte ein Datum wählen' }),
+    datum_ende: z.date().optional().nullable(),
+    uhrzeit_start: z.string().min(1, 'Startzeit ist erforderlich'),
+    uhrzeit_ende: z.string().min(1, 'Endzeit ist erforderlich'),
+    adresse: z.string().min(3, 'Adresse muss mindestens 3 Zeichen haben'),
+    plz: z.string().max(10).optional(),
+    stadt: z.string().min(2, 'Stadt muss mindestens 2 Zeichen haben'),
+    beschreibung: z.string().min(10, 'Beschreibung muss mindestens 10 Zeichen haben').max(1000),
+    kontakt: z.string().optional(),
+  })
+  .refine((d) => !d.datum_ende || d.datum_ende >= d.datum, {
+    path: ['datum_ende'],
+    message: 'Enddatum muss gleich oder nach dem Startdatum liegen',
+  });
 
 type FormData = z.infer<typeof schema>;
 interface LatLng { lat: number; lng: number }
@@ -71,6 +77,7 @@ export default function EintragenPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [manualCoords, setManualCoords] = useState<LatLng | null>(null);
   const [showMap, setShowMap] = useState(false);
+  const [mehrtägig, setMehrtägig] = useState(false);
 
   const {
     register,
@@ -98,6 +105,9 @@ export default function EintragenPage() {
       const body: Record<string, unknown> = {
         ...data,
         datum: data.datum.toISOString().split('T')[0],
+        datum_ende: mehrtägig && data.datum_ende
+          ? data.datum_ende.toISOString().split('T')[0]
+          : null,
         plz: data.plz || undefined,
       };
       if (manualCoords) {
@@ -181,7 +191,9 @@ export default function EintragenPage() {
 
                 {/* Datum */}
                 <div>
-                  <FieldLabel required>Datum</FieldLabel>
+                  <FieldLabel required>
+                    {mehrtägig ? 'Startdatum' : 'Datum'}
+                  </FieldLabel>
                   <Controller
                     name="datum"
                     control={control}
@@ -202,7 +214,47 @@ export default function EintragenPage() {
                     )}
                   />
                   <FieldError message={errors.datum?.message} />
+
+                  <label className="flex items-center gap-2 mt-3 text-sm text-stone-600 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={mehrtägig}
+                      onChange={(e) => setMehrtägig(e.target.checked)}
+                      className="rounded border-stone-300 text-orange-500 focus:ring-orange-300"
+                    />
+                    Mehrtägiger Markt (z.B. Freitag bis Sonntag)
+                  </label>
                 </div>
+
+                {/* Enddatum (nur bei mehrtägig) */}
+                {mehrtägig && (
+                  <div>
+                    <FieldLabel required>Enddatum</FieldLabel>
+                    <Controller
+                      name="datum_ende"
+                      control={control}
+                      render={({ field }) => (
+                        <input
+                          type="date"
+                          min={new Date().toISOString().split('T')[0]}
+                          className={errors.datum_ende ? errorInputClass : inputClass}
+                          onChange={(e) =>
+                            field.onChange(e.target.value ? new Date(e.target.value) : null)
+                          }
+                          value={
+                            field.value instanceof Date
+                              ? field.value.toISOString().split('T')[0]
+                              : ''
+                          }
+                        />
+                      )}
+                    />
+                    <FieldError message={errors.datum_ende?.message} />
+                    <p className="text-xs text-stone-400 mt-1.5">
+                      Die Uhrzeiten unten gelten dann für jeden Tag.
+                    </p>
+                  </div>
+                )}
 
                 {/* Zeiten */}
                 <div className="grid grid-cols-2 gap-4">

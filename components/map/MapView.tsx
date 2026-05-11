@@ -7,6 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import { Flohmarkt } from '@/lib/types';
 import Link from 'next/link';
 import TypeBadge from '../TypeBadge';
+import { formatDateRange, formatTime as fmtTime } from '@/lib/format';
 
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -33,19 +34,7 @@ function createCustomIcon() {
   });
 }
 
-function formatDatum(date: string | null | undefined): string {
-  if (!date) return '–';
-  return new Date(date + 'T00:00:00').toLocaleDateString('de-AT', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
-}
-
-function formatTime(time: string | null | undefined): string {
-  return time?.slice(0, 5) ?? '--:--';
-}
+const formatTime = fmtTime;
 
 interface MapViewProps {
   märkte: Flohmarkt[];
@@ -99,7 +88,7 @@ export default function MapView({ märkte, selectedId }: MapViewProps) {
                   {markt.title}
                 </h3>
                 <p className="text-xs text-stone-500 mb-0.5">
-                  {formatDatum(markt.date)}
+                  {formatDateRange(markt.date, markt.date_end, { withYear: true, weekday: true })}
                 </p>
                 <p className="text-xs text-stone-500 mb-0.5">
                   {formatTime(markt.time_start)} – {formatTime(markt.time_end)} Uhr

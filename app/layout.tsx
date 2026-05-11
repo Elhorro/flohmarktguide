@@ -4,13 +4,17 @@ import { Inter } from 'next/font/google';
 
 const inter = Inter({ subsets: ['latin'] });
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://flohmarktguide.netlify.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://flohmarktguide.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: 'Flohmarkt Kalender Österreich',
-    template: '%s | Flohmarkt Kalender',
+    default: 'flohmarktguide.com – Flohmärkte in Österreich',
+    template: '%s | flohmarktguide.com',
+  },
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
   },
   description:
     'Finde Flohmärkte, Fetzen- und Antikmarkte in Österreich. Steiermark und ganz Österreich – kostenlos eintragen!',

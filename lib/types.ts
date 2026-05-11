@@ -5,6 +5,7 @@ export interface Flohmarkt {
   title: string;
   market_type: FlohmarktTyp;
   date: string;
+  date_end?: string | null;
   time_start: string;
   time_end: string;
   address: string;
@@ -44,6 +45,7 @@ export type Database = {
           title: string;
           market_type: FlohmarktTyp;
           date: string;
+          date_end: string | null;
           time_start: string;
           time_end: string;
           address: string;
@@ -62,6 +64,7 @@ export type Database = {
           title: string;
           market_type: FlohmarktTyp;
           date: string;
+          date_end?: string | null;
           time_start?: string;
           time_end?: string;
           address?: string;

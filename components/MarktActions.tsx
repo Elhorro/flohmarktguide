@@ -11,15 +11,18 @@ function buildGoogleMapsUrl(markt: Flohmarkt): string {
 
 function buildICSContent(markt: Flohmarkt): string {
   const [y, m, d] = (markt.date ?? '2000-01-01').split('-');
+  // For multi-day markets, the end date is the LAST day with the end-time on that day
+  const endDate = markt.date_end && markt.date_end !== markt.date ? markt.date_end : markt.date;
+  const [ey, em_, ed] = endDate.split('-');
   const [sh, sm] = (markt.time_start ?? '00:00').split(':');
-  const [eh, em] = (markt.time_end ?? '00:00').split(':');
+  const [eh, emin] = (markt.time_end ?? '00:00').split(':');
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
     'BEGIN:VEVENT',
     `SUMMARY:${markt.title}`,
     `DTSTART:${y}${m}${d}T${sh}${sm}00`,
-    `DTEND:${y}${m}${d}T${eh}${em}00`,
+    `DTEND:${ey}${em_}${ed}T${eh}${emin}00`,
     `LOCATION:${markt.address ?? ''}, ${markt.location_name}`,
     `DESCRIPTION:${(markt.description ?? '').replace(/\n/g, '\\n')}`,
     'END:VEVENT',

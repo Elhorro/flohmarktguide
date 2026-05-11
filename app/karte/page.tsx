@@ -21,19 +21,7 @@ const MapView = dynamic(() => import('@/components/map/MapView'), {
   ),
 });
 
-function formatDatum(datum: string | null | undefined): string {
-  if (!datum) return '–';
-  const date = new Date(datum + 'T00:00:00');
-  return date.toLocaleDateString('de-AT', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-  });
-}
-
-function formatTime(time: string | null | undefined): string {
-  return time?.slice(0, 5) ?? '--:--';
-}
+import { formatDateRange, formatTime } from '@/lib/format';
 
 export default function KartenAnsicht() {
   const [märkte, setMärkte] = useState<Flohmarkt[]>([]);
@@ -128,7 +116,7 @@ export default function KartenAnsicht() {
                       </p>
                       <div className="flex items-center gap-1 mt-1 text-xs text-stone-400">
                         <Calendar size={10} />
-                        <span>{formatDatum(markt.date)}</span>
+                        <span>{formatDateRange(markt.date, markt.date_end)}</span>
                         <span className="mx-1">·</span>
                         <Clock size={10} />
                         <span>{formatTime(markt.time_start)}</span>

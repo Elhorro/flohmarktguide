@@ -22,12 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const markt = await getFlohmarktById(params.id);
   if (!markt) return { title: 'Markt nicht gefunden' };
 
-  const datum = new Date(markt.date + 'T00:00:00').toLocaleDateString('de-AT', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  const datum = formatDateRange(markt.date, markt.date_end, { withYear: true, weekday: true });
   const descriptionText = `${markt.market_type} in ${markt.location_name} am ${datum}. ${markt.address ?? ''}. ${(markt.description ?? '').slice(0, 120)}`;
   const title = `${markt.title} – ${markt.location_name}`;
 
@@ -45,18 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-function formatDatum(date: string): string {
-  return new Date(date + 'T00:00:00').toLocaleDateString('de-AT', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-}
-
-function formatTime(time: string | null | undefined): string {
-  return time?.slice(0, 5) ?? '--:--';
-}
+import { formatDateRange, formatTime } from '@/lib/format';
 
 export default async function MarktDetailPage({ params }: Props) {
   const markt: Flohmarkt | null = await getFlohmarktById(params.id);
@@ -93,8 +77,10 @@ export default async function MarktDetailPage({ params }: Props) {
                     <Calendar size={18} className="text-orange-600" />
                   </div>
                   <div>
-                    <p className="text-xs text-stone-400 font-medium mb-0.5">Datum</p>
-                    <p className="font-semibold text-stone-800 text-sm">{formatDatum(markt.date)}</p>
+                    <p className="text-xs text-stone-400 font-medium mb-0.5">
+                      {markt.date_end && markt.date_end !== markt.date ? 'Zeitraum' : 'Datum'}
+                    </p>
+                    <p className="font-semibold text-stone-800 text-sm">{formatDateRange(markt.date, markt.date_end, { withYear: true, weekday: true })}</p>
                   </div>
                 </div>
 
