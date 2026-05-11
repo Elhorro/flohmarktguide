@@ -6,7 +6,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   // Transpile ESM-only packages so webpack bundles them correctly
-  transpilePackages: ['react-leaflet', '@react-leaflet/core', 'react-leaflet-cluster'],
+  transpilePackages: ['react-leaflet', '@react-leaflet/core'],
 };
 
 module.exports = nextConfig;
